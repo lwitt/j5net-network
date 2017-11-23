@@ -49,6 +49,7 @@ typedef struct{
 typedef struct{
 	byte id;
 	byte value;
+	char type;
 } PartRelay;
 
 typedef struct{
