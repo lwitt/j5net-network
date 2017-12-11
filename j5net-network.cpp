@@ -97,17 +97,20 @@ void Message::store(void* data,byte datasize) {
 }
 
 void Message::sendSerial() {
-	Serial.print("MSG:");
-	Serial.print(getHeader()); 	Serial.print(' ');
-	Serial.print(getSource());	Serial.print(' ');
-	Serial.print(getSequence());	Serial.print(' ');
+    #if defined(__AVR_ATtiny84__)
+    #else
+        Serial.print("MSG:");
+        Serial.print(getHeader()); 	Serial.print(' ');
+        Serial.print(getSource());	Serial.print(' ');
+        Serial.print(getSequence());	Serial.print(' ');
 
-	for (byte i = 0; i < getPayloadSize(); i++) {
-		Serial.print(getPayloadByte(i));
-	  	Serial.print(' ');
-  	}
+        for (byte i = 0; i < getPayloadSize(); i++) {
+            Serial.print(getPayloadByte(i));
+            Serial.print(' ');
+        }
 
-	Serial.println(); Serial.flush(); delay(1);
+        Serial.println(); Serial.flush(); delay(1);
+    #endif
 }
 
 void Message::saveEncryptionKey(void* key) {
