@@ -7,7 +7,8 @@
 #include <avr/eeprom.h>
 
 #define J2NET_MASTER_ID 			1
-#define J2NET_NETWORK_ID			77
+#define J2NET_NETWORK_ID_1			77
+#define J2NET_NETWORK_ID_0			76
 
 #define J2NET_HEADER				77
 #define J2NET_HEADER_SIZE			3
@@ -48,7 +49,8 @@ typedef struct{
 
 typedef struct{
 	byte id;
-	byte value;
+	byte value1;
+	byte value2;
 	char type;
 } PartRelay;
 
