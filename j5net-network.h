@@ -2,9 +2,12 @@
 #define MESSAGE_h
 
 #include <Arduino.h>
+#ifdef ARDUINO_SAMD_ZERO
+#else
 #include <JeeLib.h>
 #include <avr/sleep.h>
 #include <avr/eeprom.h>
+#endif
 
 #define J2NET_MASTER_ID 			1
 #define J2NET_NETWORK_ID_1			77
@@ -74,7 +77,6 @@ public:
 	void encode(byte parttype,void* part,byte partsize);
 	void decode();
 
-	void send(byte destination,byte powermode);
 
 	byte getHeader();
 	byte getSource();
@@ -87,8 +89,12 @@ public:
 
 	void sendSerial();
 
+	#ifdef ARDUINO_SAMD_ZERO
+	#else
+	void send(byte destination,byte powermode);
 	void saveEncryptionKey(void* key);
-
+	#endif
+	
 	byte vccRead (byte count =4);
 
 	private:
