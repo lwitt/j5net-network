@@ -38,31 +38,31 @@
 // multi-part j2net elements
 
 typedef struct{
-	int temperature;
+	uint16_t temperature;
 } PartTemp;
 
 typedef struct{
-	int pulseCount;
+	uint16_t pulseCount;
 } PartPulseCount;
 
 typedef struct{
-	int temperature;
-	int humidity;
+	uint16_t temperature;
+	uint16_t humidity;
 } PartTempHumi;
 
 typedef struct{
-	byte id;
-	byte value1;
-	byte value2;
+	uint8_t id;
+	uint8_t value1;
+	uint8_t value2;
 	char type;
 } PartRelay;
 
 typedef struct{
-	byte code;
+	uint8_t code;
 } PartDoorBell;
 
 typedef struct{
-	byte vcc;
+	uint8_t vcc;
 } PartVcc;
 
 
@@ -94,7 +94,7 @@ public:
 	void send(byte destination,byte powermode);
 	void saveEncryptionKey(void* key);
 	#endif
-	
+
 	byte vccRead (byte count =4);
 
 	private:
@@ -104,7 +104,6 @@ public:
 	byte sequence;
 	byte payload[64];
 	} message;
-
 
 	byte payloadSize;
 };

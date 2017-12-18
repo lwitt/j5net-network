@@ -11,6 +11,7 @@ ISR(ADC_vect) { adcDone = true; }
 Message::Message(byte source){
 	clear();
 	message.source = source;
+	message.sequence = 0;
 }
 
 void Message::clear() {
@@ -134,7 +135,7 @@ void Message::saveEncryptionKey(void* key) {
 
 byte Message::vccRead (byte count) {
 	#ifdef ARDUINO_SAMD_ZERO
-	return(0);
+		return(115); // 3.3V
 	#else
 	set_sleep_mode(SLEEP_MODE_ADC);
 	// use VCC as AREF and internal bandgap as input
