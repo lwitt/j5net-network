@@ -83,6 +83,7 @@ public:
 	byte getSequence();
 	byte getPayloadByte(byte);
 	byte getPayloadSize();
+	byte* getPayloadPtr();
 	byte getTotalSize();
 
 	void store(void* data,byte datasize);

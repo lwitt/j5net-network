@@ -91,6 +91,10 @@ byte Message::getPayloadSize() {
 	return payloadSize;
 }
 
+byte* Message::getPayloadPtr() {
+	return &(message.payload[0]);
+}
+
 byte Message::getTotalSize() {
 	return payloadSize+3;
 }
