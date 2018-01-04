@@ -44,30 +44,78 @@ void Message::decode() {
 	// TO BE DONE
 }
 
+
+
 #ifdef ARDUINO_SAMD_ZERO
 #else
-void Message::send(byte destination,byte powermode)
-{
-	if (powermode>0) rf12_sleep(RF12_WAKEUP);
-	int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
 
-	// TODO (MEDIUM) : length of header is const (3)
-	rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
-	switch (powermode) {
-		case 0: // standard mode
-		rf12_sendWait(0);
-		break;
-		case 1: // low-power mode
-		rf12_sendWait(2);
-		rf12_sleep(RF12_SLEEP);
-		break;
-		case 2: //ultra low-power mode
-		rf12_sendWait(3);
-		rf12_sleep(RF12_SLEEP);
-		break;
+byte Message::waitForAck() {
+    MilliTimer ackTimer;
+    while (!ackTimer.poll(ACK_TIME)) {
+        if (rf12_recvDone() && rf12_crc == 0 &&
+                // see http://talk.jeelabs.net/topic/811#post-4712
+                rf12_hdr == (RF12_HDR_DST | RF12_HDR_CTL | message.source))
+            return 1;
+        set_sleep_mode(SLEEP_MODE_IDLE);
+        sleep_mode();
+    }
+    return 0;
+}
+
+void Message::send(byte destination,byte powermode,byte retries)
+{
+	// if (powermode>0) rf12_sleep(RF12_WAKEUP);
+	// int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
+	//
+	// // TODO (MEDIUM) : length of header is const (3)
+	// rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
+	// switch (powermode) {
+	// 	case 0: // standard mode
+	// 	rf12_sendWait(0);
+	// 	break;
+	// 	case 1: // low-power mode
+	// 	rf12_sendWait(2);
+	// 	rf12_sleep(RF12_SLEEP);
+	// 	break;
+	// 	case 2: //ultra low-power mode
+	// 	rf12_sendWait(3);
+	// 	rf12_sleep(RF12_SLEEP);
+	// 	break;
+	// }
+	//
+	// clear();
+
+	for (byte i = 0; i < retries; ++i) {
+		if (powermode>0) rf12_sleep(RF12_WAKEUP);
+		rf12_sendNow(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
+		switch (powermode) {
+			case 0: // standard mode
+			rf12_sendWait(0);
+			break;
+			case 1: // low-power mode
+			rf12_sendWait(2);
+			break;
+			case 2: //ultra low-power mode
+			rf12_sendWait(3);
+			break;
+		}
+		byte acked = waitForAck();
+		if (powermode>0) rf12_sleep(RF12_SLEEP);
+
+		if (acked) {
+			// #if DEBUG
+			Serial.print(" ack ");
+			Serial.println((int) i);
+			Serial.flush();
+			// #endif
+			return;
+		}
+		delay(RETRY_PERIOD * 100);
 	}
 
+
 	clear();
+
 }
 #endif
 

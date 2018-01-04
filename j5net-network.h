@@ -35,6 +35,9 @@
 #define J2NET_PART_DOOR_BELL			68
 #define J2NET_PART_VCC				70
 
+#define RETRY_PERIOD    10
+#define ACK_TIME        10
+
 // multi-part j2net elements
 
 typedef struct{
@@ -92,7 +95,8 @@ public:
 
 	#ifdef ARDUINO_SAMD_ZERO
 	#else
-	void send(byte destination,byte powermode);
+	byte waitForAck();
+	void send(byte destination,byte powermode,byte retries);
 	void saveEncryptionKey(void* key);
 	#endif
 
