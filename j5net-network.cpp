@@ -62,7 +62,7 @@ byte Message::waitForAck() {
     return 0;
 }
 
-void Message::send(byte destination,byte powermode,byte retries)
+bool Message::send(byte destination,byte powermode,byte retries)
 {
 	// if (powermode>0) rf12_sleep(RF12_WAKEUP);
 	// int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
@@ -104,6 +104,7 @@ void Message::send(byte destination,byte powermode,byte retries)
 		clear();
 
 		byte acked = waitForAck();
+		if (powermode>0) rf12_sleep(RF12_SLEEP);
 
 		if (acked) {
 		 	#if DEBUG
@@ -112,14 +113,11 @@ void Message::send(byte destination,byte powermode,byte retries)
 			Serial.println(")");
 		 	Serial.flush();
 		 	#endif
-		 	return;
+		 	return (true);
 		}
-		 delay(RETRY_PERIOD * 100);
+		delay(RETRY_PERIOD * 100);
 	}
-	if (powermode>0) rf12_sleep(RF12_SLEEP);
-
-
-
+	return(false);
 }
 #endif
 

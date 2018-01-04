@@ -96,7 +96,7 @@ public:
 	#ifdef ARDUINO_SAMD_ZERO
 	#else
 	byte waitForAck();
-	void send(byte destination,byte powermode,byte retries);
+	bool send(byte destination,byte powermode,byte retries);
 	void saveEncryptionKey(void* key);
 	#endif
 
