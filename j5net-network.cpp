@@ -66,7 +66,7 @@ void Message::send(byte destination,byte powermode,byte retries)
 {
 	// if (powermode>0) rf12_sleep(RF12_WAKEUP);
 	// int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
-	//
+      //
 	// // TODO (MEDIUM) : length of header is const (3)
 	// rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
 	// switch (powermode) {
@@ -82,12 +82,14 @@ void Message::send(byte destination,byte powermode,byte retries)
 	// 	rf12_sleep(RF12_SLEEP);
 	// 	break;
 	// }
-	//
+      //
 	// clear();
 
-	for (byte i = 0; i < retries; ++i) {
-		if (powermode>0) rf12_sleep(RF12_WAKEUP);
-		rf12_sendNow(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
+	if (powermode>0) rf12_sleep(RF12_WAKEUP);
+	for (byte j = 0; j < retries; ++j) {
+		int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
+		rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
+		//rf12_sendNow(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
 		switch (powermode) {
 			case 0: // standard mode
 			rf12_sendWait(0);
@@ -99,22 +101,24 @@ void Message::send(byte destination,byte powermode,byte retries)
 			rf12_sendWait(3);
 			break;
 		}
+		clear();
+
 		byte acked = waitForAck();
-		if (powermode>0) rf12_sleep(RF12_SLEEP);
 
 		if (acked) {
-			// #if DEBUG
-			Serial.print(" ack ");
-			Serial.println((int) i);
-			Serial.flush();
-			// #endif
-			return;
+		 	#if DEBUG
+		 	Serial.print("acked! (");
+		 	Serial.print((int) j);
+			Serial.println(")");
+		 	Serial.flush();
+		 	#endif
+		 	return;
 		}
-		delay(RETRY_PERIOD * 100);
+		 delay(RETRY_PERIOD * 100);
 	}
+	if (powermode>0) rf12_sleep(RF12_SLEEP);
 
 
-	clear();
 
 }
 #endif
