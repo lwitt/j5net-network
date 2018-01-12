@@ -50,23 +50,23 @@ void Message::decode() {
 #else
 
 byte Message::waitForAck() {
-    MilliTimer ackTimer;
-    while (!ackTimer.poll(ACK_TIME)) {
-        if (rf12_recvDone() && rf12_crc == 0 &&
-                // see http://talk.jeelabs.net/topic/811#post-4712
-                rf12_hdr == (RF12_HDR_DST | RF12_HDR_CTL | message.source))
-            return 1;
-        set_sleep_mode(SLEEP_MODE_IDLE);
-        sleep_mode();
-    }
-    return 0;
+	MilliTimer ackTimer;
+	while (!ackTimer.poll(ACK_TIME)) {
+		if (rf12_recvDone() && rf12_crc == 0 &&
+		// see http://talk.jeelabs.net/topic/811#post-4712
+		rf12_hdr == (RF12_HDR_DST | RF12_HDR_CTL | message.source))
+		return 1;
+		set_sleep_mode(SLEEP_MODE_IDLE);
+		sleep_mode();
+	}
+	return 0;
 }
 
 bool Message::send(byte destination,byte powermode,byte retries)
 {
 	// if (powermode>0) rf12_sleep(RF12_WAKEUP);
 	// int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
-      //
+	//
 	// // TODO (MEDIUM) : length of header is const (3)
 	// rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
 	// switch (powermode) {
@@ -82,7 +82,7 @@ bool Message::send(byte destination,byte powermode,byte retries)
 	// 	rf12_sleep(RF12_SLEEP);
 	// 	break;
 	// }
-      //
+	//
 	// clear();
 
 	if (powermode>0) rf12_sleep(RF12_WAKEUP);
@@ -107,13 +107,13 @@ bool Message::send(byte destination,byte powermode,byte retries)
 		if (powermode>0) rf12_sleep(RF12_SLEEP);
 
 		if (acked) {
-		 	#if DEBUG
-		 	Serial.print("acked! (");
-		 	Serial.print((int) j);
+			#if DEBUG
+			Serial.print("acked! (");
+			Serial.print((int) j);
 			Serial.println(")");
-		 	Serial.flush();
-		 	#endif
-		 	return (true);
+			Serial.flush();
+			#endif
+			return (true);
 		}
 		delay(RETRY_PERIOD * 100);
 	}
@@ -189,7 +189,7 @@ void Message::saveEncryptionKey(void* key) {
 
 byte Message::vccRead (byte count) {
 	#ifdef ARDUINO_SAMD_ZERO
-		return(115); // 3.3V
+	return(115); // 3.3V
 	#else
 	set_sleep_mode(SLEEP_MODE_ADC);
 	// use VCC as AREF and internal bandgap as input

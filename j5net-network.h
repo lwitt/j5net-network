@@ -102,12 +102,12 @@ public:
 
 	byte vccRead (byte count =4);
 
-	private:
+private:
 	struct {
-	byte header;
-	byte source;
-	byte sequence;
-	byte payload[64];
+		byte header;
+		byte source;
+		byte sequence;
+		byte payload[64];
 	} message;
 
 	byte payloadSize;
