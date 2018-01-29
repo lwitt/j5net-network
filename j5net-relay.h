@@ -29,6 +29,7 @@ public:
       void setPinMode(byte index);
       void initEEPROM();
       void setState (RelayState);
+      bool eventLoop ();
 
 private:
       RelayState currentState[MAXRELAY];

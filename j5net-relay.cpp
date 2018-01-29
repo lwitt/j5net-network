@@ -14,6 +14,7 @@ void Relay::updateCurrentState(byte id,byte value1,byte value2,char mode) {
 	while (!found && i<MAXRELAY){
 		if (currentState[i].id==id) {
 			found = true;
+
 			if ((currentState[i].value1 != value1) || (currentState[i].value2 != value2)) {
 				currentState[i].value1 = value1;
 				currentState[i].value2 = value2;
@@ -55,19 +56,25 @@ void Relay::setPinValue(byte index) {
 
 	switch (currentState[index].mode) {
 		case 'd':
-		strcpy(mode,"digital");
-		if (currentState[index].value1 == 255)
-		digitalWrite(currentState[index].pin, HIGH);
-		if (currentState[index].value1 == 0)
-		digitalWrite(currentState[index].pin, LOW);
+			strcpy(mode,"digital");
+			if (currentState[index].value1 == 255)
+				digitalWrite(currentState[index].pin, HIGH);
+			if (currentState[index].value1 == 0)
+				digitalWrite(currentState[index].pin, LOW);
 		break;
 		case 'a':
-		strcpy(mode,"analog");
-		// analogWrite(currentState[index].pin, currentState[index].value);
-		Palatis::SoftPWM.set(currentState[index].pin,currentState[index].value1);
+			strcpy(mode,"analog");
+			Palatis::SoftPWM.set(currentState[index].pin,currentState[index].value1);
 		break;
 		case 'f':
-		strcpy(mode,"fade");
+			strcpy(mode,"fade");
+		break;
+		case 'p':
+			strcpy(mode,"pulse");
+			if (currentState[index].value1 > 0)
+				digitalWrite(currentState[index].pin, HIGH);
+			else
+				digitalWrite(currentState[index].pin, LOW);
 		break;
 
 		default :
@@ -96,6 +103,9 @@ void Relay::setPinMode(byte index) {
 		case 'f':
 		strcpy(mode,"fade");
 		break;
+		case 'p':
+		strcpy(mode,"pulse");
+		break;
 		default :
 		strcpy(mode,"unknown");
 		break;
@@ -108,6 +118,21 @@ void Relay::setPinMode(byte index) {
 	//TO DO : the real state as to be defined !!
 }
 
+bool Relay::eventLoop() {
+	byte i=0; bool found=false;
+	while (i<MAXRELAY) {
+		if (currentState[i].mode == 'p' && currentState[i].value2>0) {
+			found = true;
+			currentState[i].value2--;
+
+			if (currentState[i].value2==0) {
+				setPinValue(i);
+			}
+		}
+		i++;
+	}
+	return(found);
+}
 
 void Relay::showCurrentState() {
 	for (byte i=0;i<MAXRELAY;i++) {
