@@ -71,7 +71,7 @@ void Relay::setPinValue(byte index) {
 		break;
 		case 'p':
 			strcpy(mode,"pulse");
-			if (currentState[index].value1 > 0)
+			if (currentState[index].value2 > 0)
 				digitalWrite(currentState[index].pin, HIGH);
 			else
 				digitalWrite(currentState[index].pin, LOW);
