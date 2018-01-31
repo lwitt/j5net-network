@@ -15,6 +15,17 @@ void Relay::updateCurrentState(byte id,byte value1,byte value2,char mode) {
 		if (currentState[i].id==id) {
 			found = true;
 
+			if (currentState[i].mode!=mode) {
+				currentState[i].mode = mode;
+				setPinMode(i);
+				if (mode=='a' || mode=='d') {
+					EEPROM.put(0,currentState);
+					#ifdef WITH_SERIAL
+					Serial.println("eeprom updated!");
+					#endif
+				}
+			}
+
 			if ((currentState[i].value1 != value1) || (currentState[i].value2 != value2)) {
 				currentState[i].value1 = value1;
 				currentState[i].value2 = value2;
@@ -23,14 +34,7 @@ void Relay::updateCurrentState(byte id,byte value1,byte value2,char mode) {
 				setPinValue(i);
 			}
 
-			if (currentState[i].mode!=mode && (mode=="a" || mode=="d")) {
-				currentState[i].mode = mode;
-				setPinMode(i);
-				EEPROM.put(0,currentState);
-				#ifdef WITH_SERIAL
-				Serial.println("eeprom updated!");
-				#endif
-			}
+
 		}
 		i++;
 	}
@@ -72,9 +76,9 @@ void Relay::setPinValue(byte index) {
 		case 'p':
 			strcpy(mode,"pulse");
 			if (currentState[index].value2 > 0)
-				digitalWrite(currentState[index].pin, HIGH);
+				Palatis::SoftPWM.set(currentState[index].pin,currentState[index].value1);
 			else
-				digitalWrite(currentState[index].pin, LOW);
+				Palatis::SoftPWM.set(currentState[index].pin,0);
 		break;
 
 		default :
