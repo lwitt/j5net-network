@@ -5,9 +5,6 @@
 #ifndef ARDUINO_SAMD_ZERO
 	#include <JeeLib.h>
 	#include <avr/sleep.h>
-	#ifndef __AVR_ATtiny84__
-		#include <avr/eeprom.h>
-	#endif
 #endif
 
 #define J2NET_MASTER_ID 			1
@@ -98,7 +95,6 @@ public:
 	#else
 	byte waitForAck();
 	bool send(byte destination,byte powermode,byte retries);
-	void saveEncryptionKey(void* key);
 	#endif
 
 	byte vccRead (byte count =4);

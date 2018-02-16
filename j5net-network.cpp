@@ -153,18 +153,6 @@ void Message::sendSerial() {
 	#endif
 }
 
-#ifdef ARDUINO_SAMD_ZERO || __AVR_ATtiny84__
-#else
-void Message::saveEncryptionKey(void* key) {
-	//byte numkey[16];
-	//memcpy((void*) key, numkey, 16);
-	#ifdef ARDUINO_SAMD_ZERO
-	#else
-	eeprom_write_block(key, RF12_EEPROM_EKEY, 16);
-	#endif
-	//rf12_encrypt(RF12_EEPROM_EKEY);
-}
-#endif
 
 byte Message::vccRead (byte count) {
 	#ifdef ARDUINO_SAMD_ZERO
