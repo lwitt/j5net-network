@@ -64,27 +64,6 @@ byte Message::waitForAck() {
 
 bool Message::send(byte destination,byte powermode,byte retries)
 {
-	// if (powermode>0) rf12_sleep(RF12_WAKEUP);
-	// int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
-	//
-	// // TODO (MEDIUM) : length of header is const (3)
-	// rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
-	// switch (powermode) {
-	// 	case 0: // standard mode
-	// 	rf12_sendWait(0);
-	// 	break;
-	// 	case 1: // low-power mode
-	// 	rf12_sendWait(2);
-	// 	rf12_sleep(RF12_SLEEP);
-	// 	break;
-	// 	case 2: //ultra low-power mode
-	// 	rf12_sendWait(3);
-	// 	rf12_sleep(RF12_SLEEP);
-	// 	break;
-	// }
-	//
-	// clear();
-
 	if (powermode>0) rf12_sleep(RF12_WAKEUP);
 	for (byte j = 0; j < retries; ++j) {
 		int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
@@ -174,7 +153,7 @@ void Message::sendSerial() {
 	#endif
 }
 
-#ifdef ARDUINO_SAMD_ZERO
+#ifdef ARDUINO_SAMD_ZERO || __AVR_ATtiny84__
 #else
 void Message::saveEncryptionKey(void* key) {
 	//byte numkey[16];

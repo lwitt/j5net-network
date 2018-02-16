@@ -2,11 +2,12 @@
 #define MESSAGE_h
 
 #include <Arduino.h>
-#ifdef ARDUINO_SAMD_ZERO
-#else
-#include <JeeLib.h>
-#include <avr/sleep.h>
-#include <avr/eeprom.h>
+#ifndef ARDUINO_SAMD_ZERO
+	#include <JeeLib.h>
+	#include <avr/sleep.h>
+	#ifndef __AVR_ATtiny84__
+		#include <avr/eeprom.h>
+	#endif
 #endif
 
 #define J2NET_MASTER_ID 			1
