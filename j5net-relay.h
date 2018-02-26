@@ -1,7 +1,7 @@
 #ifndef RELAY_h
 #define RELAY_h
 
-#ifndef __AVR_ATtiny84__
+#if !defined(__AVR_ATtiny84__) && !defined(ARDUINO_SAMD_ZERO)
 
       #include <Arduino.h>
       #include <JeeLib.h>

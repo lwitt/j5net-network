@@ -1,6 +1,6 @@
 #include "j5net-relay.h"
 
-#ifndef __AVR_ATtiny84__
+#if !defined(__AVR_ATtiny84__) && !defined(ARDUINO_SAMD_ZERO)
 
 	SOFTPWM_DEFINE_EXTERN_OBJECT_WITH_PWM_LEVELS(20, 100);
 
