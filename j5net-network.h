@@ -39,7 +39,7 @@
 // multi-part j2net elements
 
 typedef struct{
-	uint16_t temperature;
+	int16_t temperature;
 } PartTemp;
 
 typedef struct{
@@ -47,7 +47,7 @@ typedef struct{
 } PartPulseCount;
 
 typedef struct{
-	uint16_t temperature;
+	int16_t temperature;
 	uint16_t humidity;
 } PartTempHumi;
 
