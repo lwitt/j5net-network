@@ -73,41 +73,42 @@ class Message {
 public:
 	void clear();
 
-	Message(byte source=0);
+	Message(uint8_t source=0);
 
-	void encode(byte parttype,void* part,byte partsize);
+	void encode(uint8_t parttype,void* part,uint8_t partsize);
 	void decode();
 
 
-	byte getHeader();
-	byte getSource();
-	byte getSequence();
-	byte getPayloadByte(byte);
-	byte getPayloadSize();
-	byte* getPayloadPtr();
-	byte getTotalSize();
+	uint8_t getHeader();
+	uint8_t getSource();
+	uint8_t getSequence();
+	uint8_t getPayloadByte(uint8_);
+	uint8_ getPayloadSize();
+	uint8_* getPayloadPtr();
+	uint8_ getTotalSize();
 
-	void store(void* data,byte datasize);
+	void store(void* data,uint8_ datasize);
 
 	void sendSerial();
 
 	#ifdef ARDUINO_SAMD_ZERO
 	#else
-	byte waitForAck();
-	bool send(byte destination,byte powermode,byte retries,bool with_ack);
+	uint8_t waitForAck();
+	bool send(uint8_t destination,uint8_t powermode,uint8_t retries,bool with_ack);
 	#endif
 
-	byte vccRead (byte count =4);
+	uint8_t vccRead (uint8_t count =4);
+	uint8_t vccRead2 (uint8_t count =4);
 
 private:
 	struct {
-		byte header;
-		byte source;
-		byte sequence;
-		byte payload[64];
+		uint8_t header;
+		uint8_t source;
+		uint8_t sequence;
+		uint8_t payload[64];
 	} message;
 
-	byte payloadSize;
+	uint8_t payloadSize;
 };
 
 

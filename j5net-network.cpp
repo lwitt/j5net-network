@@ -8,7 +8,7 @@ volatile bool adcDone;
 ISR(ADC_vect) { adcDone = true; }
 #endif
 
-Message::Message(byte source){
+Message::Message(uint8_ source){
 	clear();
 	message.source = source;
 	message.sequence = 0;
@@ -21,7 +21,7 @@ void Message::clear() {
 	memset(message.payload,0,64);
 }
 
-void Message::encode(byte parttype,void* part,byte partsize)
+void Message::encode(uint8_ parttype,void* part,uint8_ partsize)
 {
 	if (message.header==0) {
 		message.header=J2NET_HEADER;
@@ -49,7 +49,7 @@ void Message::decode() {
 #ifdef ARDUINO_SAMD_ZERO
 #else
 
-byte Message::waitForAck() {
+uint8_ Message::waitForAck() {
 	MilliTimer ackTimer;
 	while (!ackTimer.poll(ACK_TIME)) {
 		if (rf12_recvDone() && rf12_crc == 0 &&
@@ -62,10 +62,10 @@ byte Message::waitForAck() {
 	return 0;
 }
 
-bool Message::send(byte destination,byte powermode,byte retries,bool with_ack)
+bool Message::send(uint8_ destination,uint8_ powermode,uint8_ retries,bool with_ack)
 {
 	if (powermode>0) rf12_sleep(RF12_WAKEUP);
-	for (byte j = 0; j < retries; j++) {
+	for (uint8_ j = 0; j < retries; j++) {
 		int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
 		rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
 		//rf12_sendNow(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
@@ -83,7 +83,7 @@ bool Message::send(byte destination,byte powermode,byte retries,bool with_ack)
 		clear();
 
 		if (with_ack) {
-			byte acked = waitForAck();
+			uint8_ acked = waitForAck();
 			if (acked) {
 				#if DEBUG
 				Serial.print("acked! (");
@@ -102,35 +102,35 @@ bool Message::send(byte destination,byte powermode,byte retries,bool with_ack)
 }
 #endif
 
-byte Message::getHeader() {
+uint8_ Message::getHeader() {
 	return message.header;
 }
 
-byte Message::getSource() {
+uint8_ Message::getSource() {
 	return message.source;
 }
 
-byte Message::getSequence() {
+uint8_ Message::getSequence() {
 	return message.sequence;
 }
 
-byte Message::getPayloadByte(byte pos) {
+uint8_ Message::getPayloadByte(uint8_ pos) {
 	return message.payload[pos];
 }
 
-byte Message::getPayloadSize() {
+uint8_ Message::getPayloadSize() {
 	return payloadSize;
 }
 
-byte* Message::getPayloadPtr() {
+uint8_* Message::getPayloadPtr() {
 	return &(message.payload[0]);
 }
 
-byte Message::getTotalSize() {
+uint8_ Message::getTotalSize() {
 	return payloadSize+3;
 }
 
-void Message::store(void* data,byte datasize) {
+void Message::store(void* data,uint8_ datasize) {
 	memcpy(&message,data,datasize);
 	if (datasize>=3)
 	payloadSize=datasize-3;
@@ -146,7 +146,7 @@ void Message::sendSerial() {
 	Serial.print(getSource());	Serial.print(' ');
 	Serial.print(getSequence());	Serial.print(' ');
 
-	for (byte i = 0; i < getPayloadSize(); i++) {
+	for (uint8_ i = 0; i < getPayloadSize(); i++) {
 		Serial.print(getPayloadByte(i));
 		Serial.print(' ');
 	}
@@ -156,7 +156,7 @@ void Message::sendSerial() {
 }
 
 
-byte Message::vccRead (byte count) {
+uint8_ Message::vccRead (uint8_ count) {
 	#ifdef ARDUINO_SAMD_ZERO
 	return(115); // 3.3V
 	#else
@@ -178,4 +178,42 @@ byte Message::vccRead (byte count) {
 	//  1.0V = 0, 1.8V = 40, 3.3V = 115, 5.0V = 200, 6.0V = 250
 	return (55U * 1024U) / (ADC + 1) - 50;
 	#endif
+}
+
+// improved version supporting Moteino..
+
+uint8_t Message::vccRead2(bool restoreMux) {
+  unsigned long result;
+  uint8_ saveADMUX;
+
+  saveADMUX = ADMUX;
+  // Read 1.1V reference against AVcc
+  // set the reference to Vcc and the measurement to the internal 1.1V reference
+  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1284P__)
+    ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  #elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+    ADMUX = _BV(MUX5) | _BV(MUX0);
+  #elif defined (__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+    ADMUX = _BV(MUX3) | _BV(MUX2);
+  #else
+    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  #endif
+
+  #if defined(__AVR_ATmega2560__)
+        ADCSRB = 0;
+  #endif
+
+  delay(20); // Wait for Vref to settle
+  ADCSRA |= _BV(ADSC); // Start conversion
+  while (bit_is_set(ADCSRA,ADSC)); // measuring
+
+  uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH
+  uint8_t high = ADCH; // unlocks both
+
+  result = (high<<8) | low;
+  result = (55U * 1024U) / (result + 1) - 50; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000 (because...= 3300*1023/3 since 1.1 is exactly 1/3 of 3.3V)
+
+  if (restoreMux) ADMUX = saveADMUX;
+
+  return result; // Vcc in millivolts
 }
