@@ -98,7 +98,7 @@ public:
 	#endif
 
 	uint8_t vccRead (uint8_t count =4);
-	uint8_t vccRead2 (uint8_t count =4);
+	uint8_t vccRead2(bool);
 
 private:
 	struct {
