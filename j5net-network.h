@@ -82,12 +82,12 @@ public:
 	uint8_t getHeader();
 	uint8_t getSource();
 	uint8_t getSequence();
-	uint8_t getPayloadByte(uint8_);
-	uint8_ getPayloadSize();
-	uint8_* getPayloadPtr();
-	uint8_ getTotalSize();
+	uint8_t getPayloadByte(uint8_t);
+	uint8_t getPayloadSize();
+	uint8_t* getPayloadPtr();
+	uint8_t getTotalSize();
 
-	void store(void* data,uint8_ datasize);
+	void store(void* data,uint8_t datasize);
 
 	void sendSerial();
 

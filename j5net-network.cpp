@@ -8,7 +8,7 @@ volatile bool adcDone;
 ISR(ADC_vect) { adcDone = true; }
 #endif
 
-Message::Message(uint8_ source){
+Message::Message(uint8_t source){
 	clear();
 	message.source = source;
 	message.sequence = 0;
@@ -21,7 +21,7 @@ void Message::clear() {
 	memset(message.payload,0,64);
 }
 
-void Message::encode(uint8_ parttype,void* part,uint8_ partsize)
+void Message::encode(uint8_t parttype,void* part,uint8_t partsize)
 {
 	if (message.header==0) {
 		message.header=J2NET_HEADER;
@@ -49,7 +49,7 @@ void Message::decode() {
 #ifdef ARDUINO_SAMD_ZERO
 #else
 
-uint8_ Message::waitForAck() {
+uint8_t Message::waitForAck() {
 	MilliTimer ackTimer;
 	while (!ackTimer.poll(ACK_TIME)) {
 		if (rf12_recvDone() && rf12_crc == 0 &&
@@ -62,10 +62,10 @@ uint8_ Message::waitForAck() {
 	return 0;
 }
 
-bool Message::send(uint8_ destination,uint8_ powermode,uint8_ retries,bool with_ack)
+bool Message::send(uint8_t destination,uint8_t powermode,uint8_t retries,bool with_ack)
 {
 	if (powermode>0) rf12_sleep(RF12_WAKEUP);
-	for (uint8_ j = 0; j < retries; j++) {
+	for (uint8_t j = 0; j < retries; j++) {
 		int i = 0; while (!rf12_canSend() && i<10) {rf12_recvDone(); i++;}
 		rf12_sendStart(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
 		//rf12_sendNow(RF12_HDR_ACK | RF12_HDR_DST | destination, &message, 3+payloadSize);
@@ -83,7 +83,7 @@ bool Message::send(uint8_ destination,uint8_ powermode,uint8_ retries,bool with_
 		clear();
 
 		if (with_ack) {
-			uint8_ acked = waitForAck();
+			uint8_t acked = waitForAck();
 			if (acked) {
 				#if DEBUG
 				Serial.print("acked! (");
@@ -102,35 +102,35 @@ bool Message::send(uint8_ destination,uint8_ powermode,uint8_ retries,bool with_
 }
 #endif
 
-uint8_ Message::getHeader() {
+uint8_t Message::getHeader() {
 	return message.header;
 }
 
-uint8_ Message::getSource() {
+uint8_t Message::getSource() {
 	return message.source;
 }
 
-uint8_ Message::getSequence() {
+uint8_t Message::getSequence() {
 	return message.sequence;
 }
 
-uint8_ Message::getPayloadByte(uint8_ pos) {
+uint8_t Message::getPayloadByte(uint8_t pos) {
 	return message.payload[pos];
 }
 
-uint8_ Message::getPayloadSize() {
+uint8_t Message::getPayloadSize() {
 	return payloadSize;
 }
 
-uint8_* Message::getPayloadPtr() {
+uint8_t* Message::getPayloadPtr() {
 	return &(message.payload[0]);
 }
 
-uint8_ Message::getTotalSize() {
+uint8_t Message::getTotalSize() {
 	return payloadSize+3;
 }
 
-void Message::store(void* data,uint8_ datasize) {
+void Message::store(void* data,uint8_t datasize) {
 	memcpy(&message,data,datasize);
 	if (datasize>=3)
 	payloadSize=datasize-3;
@@ -146,7 +146,7 @@ void Message::sendSerial() {
 	Serial.print(getSource());	Serial.print(' ');
 	Serial.print(getSequence());	Serial.print(' ');
 
-	for (uint8_ i = 0; i < getPayloadSize(); i++) {
+	for (uint8_t i = 0; i < getPayloadSize(); i++) {
 		Serial.print(getPayloadByte(i));
 		Serial.print(' ');
 	}
@@ -156,7 +156,7 @@ void Message::sendSerial() {
 }
 
 
-uint8_ Message::vccRead (uint8_ count) {
+uint8_t Message::vccRead (uint8_t count) {
 	#ifdef ARDUINO_SAMD_ZERO
 	return(115); // 3.3V
 	#else
@@ -184,7 +184,7 @@ uint8_ Message::vccRead (uint8_ count) {
 
 uint8_t Message::vccRead2(bool restoreMux) {
   unsigned long result;
-  uint8_ saveADMUX;
+  uint8_t saveADMUX;
 
   saveADMUX = ADMUX;
   // Read 1.1V reference against AVcc
