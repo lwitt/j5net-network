@@ -183,6 +183,9 @@ uint8_t Message::vccRead (uint8_t count) {
 // improved version supporting Moteino..
 
 uint8_t Message::vccRead2(bool restoreMux) {
+#ifdef ARDUINO_SAMD_ZERO
+return(115); // 3.3V
+#else
   unsigned long result;
   uint8_t saveADMUX;
 
@@ -216,4 +219,5 @@ uint8_t Message::vccRead2(bool restoreMux) {
   if (restoreMux) ADMUX = saveADMUX;
 
   return result; // Vcc in millivolts
+ #endif
 }
